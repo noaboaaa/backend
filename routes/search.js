@@ -1,6 +1,5 @@
 const express = require("express");
-const dbConnection = require("./db.js"); // Make sure this path is correct
-
+const dbConnection = require("../db.js"); // Make sure this path is correct
 const searchRouter = express.Router();
 
 // Search artists
@@ -33,6 +32,7 @@ searchRouter.get("/albums", (req, res) => {
   });
 });
 
+
 // Search tracks
 searchRouter.get("/tracks", (req, res) => {
   const searchTerm = req.query.q;
@@ -49,3 +49,5 @@ searchRouter.get("/tracks", (req, res) => {
 });
 
 module.exports = searchRouter;
+
+

@@ -1,8 +1,25 @@
+const express = require("express");
+const albumsRouter = express.Router();
+const dbConnection = require("../db.js"); // Update with the correct path to your db.js
 
-//GET Endpoint "/albums" - Get All Albums
+
+// GET Endpoint "/albums" - Get All Albums along with their artist names
 albumsRouter.get("/", (request, response) => {
-  const queryString = /*sql*/ `
-    SELECT * FROM albums;
+  const queryString = `
+    SELECT 
+        alb.id, 
+        alb.title, 
+        alb.releaseYear, 
+        alb.coverImageUrl, 
+        GROUP_CONCAT(art.name ORDER BY art.name SEPARATOR ', ') AS artistNames
+    FROM 
+        albums alb
+    LEFT JOIN 
+        artist_albums aa ON alb.id = aa.album_id
+    LEFT JOIN 
+        artists art ON aa.artist_id = art.id
+    GROUP BY 
+        alb.id;
   `;
 
   dbConnection.query(queryString, (error, results) => {
@@ -13,6 +30,7 @@ albumsRouter.get("/", (request, response) => {
     }
   });
 });
+
 
 //GET Endpoint "/albums/:id" - Get Specific Album with Tracks
 albumsRouter.get("/:id", (request, response) => {
@@ -64,9 +82,9 @@ albumsRouter.get("/:id/tracks", (request, response) => {
 });
 
 // POST Endpoint to create a new album
-albumsRouter.post('/', (request, response) => {
+albumsRouter.post("/", (request, response) => {
   const { title, releaseYear, coverImageUrl } = request.body;
-  
+
   const queryString = /*sql*/ `
     INSERT INTO albums (title, releaseYear, coverImageUrl) VALUES (?, ?, ?);
   `;
@@ -76,7 +94,15 @@ albumsRouter.post('/', (request, response) => {
     if (error) {
       response.status(500).json({ error: "Internal Server Error" });
     } else {
-      response.status(201).json({ message: "Album created successfully", albumId: results.insertId });
+      response
+        .status(201)
+        .json({
+          message: "Album created successfully",
+          albumId: results.insertId,
+        });
     }
   });
 });
+
+
+module.exports = albumsRouter;

@@ -1,10 +1,10 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const artistsRouter = require("./artists");
-const albumsRouter = require("./albums");
-const tracksRouter = require("./tracks");
-const searchRouter = require("./search"); // Ensure this file exists and is correctly set up
+const artistsRouter = require("./routes/artists");
+const albumsRouter = require("./routes/albums");
+const tracksRouter = require("./routes/tracks");
+const searchRouter = require("./routes/search"); // Ensure this file exists and is correctly set up
 
 dotenv.config();
 
