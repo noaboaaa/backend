@@ -31,6 +31,60 @@ albumsRouter.get("/", (request, response) => {
   });
 });
 
+// Search for Albums and their related artists and tracks
+albumsRouter.get("/search", (req, res) => {
+  const searchTerm = req.query.q;
+  const albumQueryString = `
+    SELECT * FROM albums WHERE title LIKE ? ORDER BY title;
+  `;
+  const albumValues = [`%${searchTerm}%`];
+
+  dbConnection.query(albumQueryString, albumValues, (error, albums) => {
+    if (error) {
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    let completedAlbumCount = 0;
+    if (albums.length === 0) {
+      return res.json([]); // Return an empty array if no albums found
+    }
+
+    albums.forEach((album, index) => {
+      // Fetch artists for each album
+      const artistQueryString = `
+        SELECT artists.* FROM artists
+        JOIN artist_albums ON artists.id = artist_albums.artist_id
+        WHERE artist_albums.album_id = ?;
+      `;
+      dbConnection.query(artistQueryString, [album.id], (artistError, artistResults) => {
+        if (artistError) {
+          return res.status(500).json({ error: "Internal Server Error" });
+        }
+        albums[index].artists = artistResults;
+
+        // Fetch tracks for each album
+        const trackQueryString = `
+          SELECT tracks.* FROM tracks
+          JOIN album_tracks ON tracks.id = album_tracks.track_id
+          WHERE album_tracks.album_id = ?;
+        `;
+        dbConnection.query(trackQueryString, [album.id], (trackError, trackResults) => {
+          if (trackError) {
+            return res.status(500).json({ error: "Internal Server Error" });
+          }
+
+          albums[index].tracks = trackResults;
+
+          completedAlbumCount++;
+          if (completedAlbumCount === albums.length) {
+            res.json(albums);
+          }
+        });
+      });
+    });
+  });
+});
+
 
 //GET Endpoint "/albums/:id" - Get Specific Album with Tracks
 albumsRouter.get("/:id", (request, response) => {
