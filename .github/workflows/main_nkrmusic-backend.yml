@@ -66,6 +66,5 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'nkrmusic-backend'
-          slot-name: 'Production'
           package: .
           
