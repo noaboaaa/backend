@@ -7,6 +7,10 @@ This guide will walk you through setting up and running the backend server for t
 
 **Frontend Repository:** https://github.com/noaboaaa/frontend2023
 
+https://nkrmusic-backend.azurewebsites.net/
+
+https://nkrmusic-frontend.azurewebsites.net/
+
 **Prerequisites**
 Node.js installed on your machine.
 
